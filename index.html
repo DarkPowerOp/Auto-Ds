@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDs | Electric Items</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e293b;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); line-height: 1.6; }
+
+        /* Header */
+        header { 
+            background: var(--card); padding: 1.5rem; text-align: center; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;
+        }
+        header h1 { color: var(--primary); font-size: 1.8rem; letter-spacing: -1px; }
+        header p { color: var(--text-light); font-size: 0.9rem; }
+
+        /* Categories */
+        .categories { 
+            display: flex; overflow-x: auto; gap: 0.5rem; padding: 1rem; 
+            scrollbar-width: none; white-space: nowrap; justify-content: center;
+        }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            padding: 0.5rem 1.2rem; border-radius: 20px; border: 1px solid #ddd;
+            background: white; cursor: pointer; transition: 0.3s; font-size: 0.9rem;
+        }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Product Grid */
+        .products { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 1rem; padding: 1rem; max-width: 1000px; margin: 0 auto;
+        }
+        .product-card { 
+            background: var(--card); border-radius: 12px; overflow: hidden; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: transform 0.2s;
+        }
+        .product-card:active { transform: scale(0.98); }
+        .product-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #eee; }
+        .product-info { padding: 0.8rem; }
+        .product-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+        .product-desc { font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.5rem; height: 2.4em; overflow: hidden; }
+        .product-price { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
+        .add-btn {
+            width: 100%; background: var(--secondary); color: white; border: none;
+            padding: 0.6rem; border-radius: 6px; margin-top: 0.5rem; cursor: pointer; font-weight: 600;
+        }
+
+        /* Cart Modal */
+        #cart-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+            display: none; z-index: 200; align-items: flex-end;
+        }
+        .cart-content {
+            background: white; width: 100%; max-height: 90vh; 
+            border-radius: 20px 20px 0 0; padding: 1.5rem; overflow-y: auto;
+        }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
+        .qty-controls { display: flex; align-items: center; gap: 0.8rem; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ddd; background: white; }
+
+        /* Sticky Elements */
+        .cart-trigger {
+            position: fixed; bottom: 20px; right: 20px; background: var(--primary);
+            color: white; width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); cursor: pointer; z-index: 150;
+        }
+        #cart-count { position: absolute; top: 0; right: 0; background: red; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; }
+
+        /* Forms */
+        input, textarea { width: 100%; padding: 0.8rem; margin: 0.5rem 0; border: 1px solid #ddd; border-radius: 8px; }
+        .checkout-btn { background: var(--accent); color: white; width: 100%; padding: 1rem; border: none; border-radius: 8px; font-weight: 700; margin-top: 1rem; cursor: pointer; }
+
+        /* Floating WhatsApp */
+        .wa-float {
+            position: fixed; bottom: 20px; left: 20px; background: #25d366;
+            color: white; padding: 0.8rem 1.2rem; border-radius: 30px;
+            text-decoration: none; font-size: 0.8rem; font-weight: 700; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        @media (min-width: 768px) {
+            #cart-modal { align-items: center; justify-content: center; }
+            .cart-content { max-width: 500px; border-radius: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>AutoDs</h1>
+    <p>Electric Items | Kolkata</p>
+</header>
+
+<div class="categories" id="category-bar">
+    <button class="cat-btn active" onclick="filterProducts('All')">All Items</button>
+    <button class="cat-btn" onclick="filterProducts('mobile Items')">Mobile</button>
+    <button class="cat-btn" onclick="filterProducts('Overhead')">Overhead</button>
+    <button class="cat-btn" onclick="filterProducts('Charger')">Chargers</button>
+</div>
+
+<div class="products" id="product-grid"></div>
+
+<a href="https://wa.me/916290789761" class="wa-float" target="_blank">💬 WhatsApp Us</a>
+
+<div class="cart-trigger" onclick="toggleCart()">
+    🛒 <span id="cart-count">0</span>
+</div>
+
+<div id="cart-modal">
+    <div class="cart-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2>Your Cart</h2>
+            <button onclick="toggleCart()" style="border: none; background: none; font-size: 1.5rem;">&times;</button>
+        </div>
+        
+        <div id="cart-items-list"></div>
+        
+        <div style="margin-top: 1rem; border-top: 2px solid #eee; padding-top: 1rem;">
+            <h3>Total: ₹<span id="grand-total">0</span></h3>
+        </div>
+
+        <form id="order-form" action="https://formspree.io/f/xbdabkel" method="POST">
+            <input type="hidden" name="_subject" value="New Order from AutoDs">
+            <textarea name="Order_Details" id="hidden-cart-data" style="display:none"></textarea>
+            
+            <input type="text" name="Customer_Name" placeholder="Full Name" required>
+            <input type="tel" name="Phone" placeholder="Phone Number" required>
+            <textarea name="Address" placeholder="Full Delivery Address" required></textarea>
+            <input type="text" name="Instructions" placeholder="Special Instructions (Optional)">
+            
+            <button type="submit" class="checkout-btn">Place Order via Email</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const products = [
+        { id: 1, name: "Super Fast Charger", price: 499, cat: "Charger", desc: "Immortal 25W Charging Adapter", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 2, name: "Premium Earphones", price: 299, cat: "mobile Items", desc: "Immortal sound quality wired", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 3, name: "USB-C Data Cable", price: 199, cat: "Charger", desc: "Immortal braided high-speed cable", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 4, name: "LED Overhead Bulb", price: 150, cat: "Overhead", desc: "Immortal 9W Energy Efficient", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 5, name: "Phone Stand", price: 99, cat: "mobile Items", desc: "Immortal adjustable desktop stand", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 6, name: "Ceiling Fan Regulator", price: 120, cat: "Overhead", desc: "Immortal smooth step control", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 7, name: "Car Charger Dual Port", price: 350, cat: "Charger", desc: "Immortal drive-safe adapter", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 8, name: "Bluetooth Speaker", price: 899, cat: "mobile Items", desc: "Immortal bass portable speaker", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 9, name: "Tube Light 20W", price: 250, cat: "Overhead", desc: "Immortal bright white LED", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" },
+        { id: 10, name: "Micro USB Cable", price: 149, cat: "Charger", desc: "Immortal durable charging cord", img: "https://i.ibb.co/YB5nFLqz/file-000000004e0872069bf124be8ebfac54.png" }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem('autods_cart')) || [];
+
+    function renderProducts(filter = 'All') {
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = '';
+        const filtered = filter === 'All' ? products : products.filter(p => p.cat === filter);
+        
+        filtered.forEach(p => {
+            grid.innerHTML += `
+                <div class="product-card">
+                    <img src="${p.img}" class="product-img" alt="${p.name}" loading="lazy">
+                    <div class="product-info">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-desc">${p.desc}</div>
+                        <div class="product-price">₹${p.price}</div>
+                        <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function filterProducts(cat) {
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.innerText === cat || (cat === 'All' && btn.innerText === 'All Items'));
+        });
+        renderProducts(cat);
+    }
+
+    function addToCart(id) {
+        const product = products.find(p => p.id === id);
+        const existing = cart.find(item => item.id === id);
+        if(existing) {
+            existing.qty++;
+        } else {
+            cart.push({...product, qty: 1});
+        }
+        updateCart();
+    }
+
+    function updateCart() {
+        localStorage.setItem('autods_cart', JSON.stringify(cart));
+        const count = cart.reduce((sum, item) => sum + item.qty, 0);
+        document.getElementById('cart-count').innerText = count;
+        renderCartItems();
+    }
+
+    function renderCartItems() {
+        const list = document.getElementById('cart-items-list');
+        const totalEl = document.getElementById('grand-total');
+        const hiddenInput = document.getElementById('hidden-cart-data');
+        list.innerHTML = '';
+        let total = 0;
+        let summaryText = "";
+
+        cart.forEach(item => {
+            const subtotal = item.price * item.qty;
+            total += subtotal;
+            summaryText += `${item.name} x${item.qty} - ₹${subtotal}\n`;
+            
+            list.innerHTML += `
+                <div class="cart-item">
+                    <div>
+                        <div style="font-weight:600">${item.name}</div>
+                        <div style="font-size:0.8rem; color:var(--text-light)">₹${item.price} each</div>
+                    </div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+                        <span>${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        totalEl.innerText = total;
+        hiddenInput.value = `TOTAL ORDER: ₹${total}\n\nITEMS:\n${summaryText}`;
+        if(cart.length === 0) list.innerHTML = '<p style="text-align:center; padding: 2rem;">Cart is empty!</p>';
+    }
+
+    function changeQty(id, delta) {
+        const index = cart.findIndex(item => item.id === id);
+        cart[index].qty += delta;
+        if(cart[index].qty < 1) cart.splice(index, 1);
+        updateCart();
+    }
+
+    function toggleCart() {
+        const modal = document.getElementById('cart-modal');
+        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    document.getElementById('order-form').onsubmit = function() {
+        if(cart.length === 0) {
+            alert("Your cart is empty!");
+            return false;
+        }
+        setTimeout(() => {
+            alert("Order placed! AutoDs will contact you on WhatsApp to confirm.");
+            cart = [];
+            updateCart();
+            window.location.href = "https://wa.me/916290789761?text=I%20just%20placed%20an%20order%20on%20your%20website.";
+        }, 500);
+    };
+
+    // Initial Load
+    renderProducts();
+    updateCart();
+</script>
+
+</body>
+</html>
